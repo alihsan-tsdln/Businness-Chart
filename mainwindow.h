@@ -12,6 +12,7 @@
 #include <QListWidgetItem>
 #include "sure_duzenleme.h"
 #include "parca_ekle.h"
+#include <QTimer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -55,6 +56,8 @@ private slots:
     void tabloHatirla();
 
     void setMovementSec(QTableWidgetItem *item);
+
+    void drawTimeLine();
 
 private:
     Ui::MainWindow *ui;

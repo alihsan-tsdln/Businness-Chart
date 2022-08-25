@@ -21,11 +21,10 @@ QStringList *alphabet;
 QStringList *lst;
 int fixedRow = 0;
 QTableWidgetItem *prevItem = nullptr;
+QLabel *labelLine = nullptr;
 
 void MainWindow::init()
 {
-    sql.setDatabaseName("./db.db");
-
     if(sql.open())
         ui->statusbar->showMessage("Veritabanına Bağlanıldı");
 
@@ -58,6 +57,10 @@ void MainWindow::init()
     listAdder();
 
     tabloHatirla();
+    QTimer *timer = new QTimer(this);
+    drawTimeLine();
+    connect(timer, SIGNAL(timeout()), this, SLOT(drawTimeLine()));
+    timer->start(60000);
 }
 
 void MainWindow::addItem(QTableWidget *tw, const QString barcode, int time)
@@ -164,6 +167,25 @@ void MainWindow::tabloUpdate()
             if(!query.exec())
                 qDebug() << query.lastError().text();
         }
+    }
+}
+
+void MainWindow::drawTimeLine()
+{
+    if(labelLine)
+    {
+        labelLine->deleteLater();
+        labelLine = nullptr;
+    }
+    int mesai = QTime::currentTime().addSecs(-30600).hour() * 60 + QTime::currentTime().addSecs(-30600).minute();
+    if(mesai > 0 && mesai <= 450)
+    {
+        labelLine = new QLabel(this);
+        QPixmap px(2,585);
+        px.fill(Qt::black);
+        labelLine->setPixmap(px);
+        labelLine->setGeometry(205 + 14 * mesai / 9 ,25, 2, 585);
+        labelLine->show();
     }
 }
 

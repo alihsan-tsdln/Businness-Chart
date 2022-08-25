@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 6.0.2, 2022-08-17T15:47:35. -->
+<!-- Written by QtCreator 6.0.2, 2022-08-25T14:12:53. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -85,6 +85,9 @@
     <valuelist type="QVariantList" key="ClangTools.SuppressedDiagnostics"/>
     <value type="bool" key="ClangTools.UseGlobalSettings">true</value>
    </valuemap>
+   <valuemap type="QVariantMap" key="CppEditor.QuickFix">
+    <value type="bool" key="UseGlobalSettings">true</value>
+   </valuemap>
   </valuemap>
  </data>
  <data>
@@ -94,7 +97,7 @@
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Desktop Qt 6.3.0 MinGW 64-bit</value>
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Desktop Qt 6.3.0 MinGW 64-bit</value>
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">qt.qt6.630.win64_mingw_kit</value>
-   <value type="qlonglong" key="ProjectExplorer.Target.ActiveBuildConfiguration">1</value>
+   <value type="qlonglong" key="ProjectExplorer.Target.ActiveBuildConfiguration">0</value>
    <value type="qlonglong" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
    <value type="qlonglong" key="ProjectExplorer.Target.ActiveRunConfiguration">0</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.0">
@@ -240,14 +243,15 @@
     <valuelist type="QVariantList" key="CustomOutputParsers"/>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/Users/alihsan-tsdln/Desktop/Coding/VisualProgramming/GMM_Is_Cizelgesi/GMM_Is_Cizelgesi.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/Users/alihsan-tsdln/Desktop/Coding/VisualProgramming/GMM_Is_Cizelgesi/GMM_Is_Cizelgesi.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">GMM_Is_Cizelgesi2</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/Users/alihsan-tsdln/Desktop/Coding/VisualProgramming/GMM_Is_Cizelgesi/Businness-Chart/GMM_Is_Cizelgesi.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/Users/alihsan-tsdln/Desktop/Coding/VisualProgramming/GMM_Is_Cizelgesi/Businness-Chart/GMM_Is_Cizelgesi.pro</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">C:/Users/alihsan-tsdln/Desktop/Coding/VisualProgramming/build-GMM_Is_Cizelgesi-Desktop_Qt_6_3_0_MinGW_64_bit-Release</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">C:/Users/alihsan-tsdln/Desktop/Coding/VisualProgramming/build-GMM_Is_Cizelgesi-Desktop_Qt_6_3_0_MinGW_64_bit-Debug</value>
    </valuemap>
    <value type="qlonglong" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
   </valuemap>
