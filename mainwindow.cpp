@@ -25,6 +25,8 @@ QLabel *labelLine = nullptr;
 
 void MainWindow::init()
 {
+    sql.setDatabaseName("./db.db");
+
     if(sql.open())
         ui->statusbar->showMessage("Veritabanına Bağlanıldı");
 
@@ -55,8 +57,13 @@ void MainWindow::init()
     tableWidgetAdder();
     colorAdder();
     listAdder();
+    addPastWeeks();
+    addWeek();
+    sortDays();
 
-    tabloHatirla();
+    //tabloHatirla();
+    ui->comboBox->setCurrentText(QDate::currentDate().toString("dd.MM.yyyy"));
+
     QTimer *timer = new QTimer(this);
     drawTimeLine();
     connect(timer, SIGNAL(timeout()), this, SLOT(drawTimeLine()));
@@ -151,14 +158,14 @@ void MainWindow::listInit()
 void MainWindow::tabloUpdate()
 {
     QSqlQuery query;
-    query.exec("delete from tablo");
+    query.exec("delete from tablo where tarih = '" + ui->tableWidget->horizontalHeaderItem(0)->text() + "'");
 
     for(int i = 0; i < twList->count(); i++)
     {
         for(int j = 0; j < twList->at(i)->columnCount(); j++)
         {
             query.prepare("insert into tablo values(:tarih, :tezgah, :genislik, :barkod, :sira)");
-            query.bindValue(":tarih", QDate::currentDate().toString("dd.MM.yyyy"));
+            query.bindValue(":tarih", ui->tableWidget->horizontalHeaderItem(0)->text());
             query.bindValue(":tezgah", i);
             query.bindValue(":genislik", 225 * twList->at(i)->columnWidth(j) / 364);
             query.bindValue(":barkod", twList->at(i)->item(0,j)->text());
@@ -168,6 +175,90 @@ void MainWindow::tabloUpdate()
                 qDebug() << query.lastError().text();
         }
     }
+}
+
+void MainWindow::addWeek()
+{
+/*
+    ui->comboBox->addItem();
+*/
+
+    QStringList *weeks = new QStringList();
+    weeks->append(QDate::currentDate().toString("dd.MM.yyyy"));
+    weeks->append(QDate::currentDate().addDays(1).toString("dd.MM.yyyy"));
+    weeks->append(QDate::currentDate().addDays(2).toString("dd.MM.yyyy"));
+    weeks->append(QDate::currentDate().addDays(3).toString("dd.MM.yyyy"));
+    weeks->append(QDate::currentDate().addDays(4).toString("dd.MM.yyyy"));
+    weeks->append(QDate::currentDate().addDays(5).toString("dd.MM.yyyy"));
+    weeks->append(QDate::currentDate().addDays(6).toString("dd.MM.yyyy"));
+
+    for(int i = 0; i < weeks->count(); i++)
+    {
+        bool key = true;
+        for(int j = 0; j < ui->comboBox->count(); j++)
+        {
+            if(weeks->at(i) == ui->comboBox->itemText(j))
+            {
+                key = false;
+                break;
+            }
+        }
+
+        if(key)
+            ui->comboBox->addItem(weeks->at(i));
+    }
+
+
+}
+
+void MainWindow::addPastWeeks()
+{
+    QSqlQuery query;
+    query.exec("select tarih from tablo");
+    while(query.next())
+    {
+        bool key = true;
+        for(int i = 0; i < ui->comboBox->count(); i++)
+        {
+            if(query.value(0).toString() == ui->comboBox->itemText(i))
+            {
+                key = false;
+                break;
+            }
+        }
+
+        if(key)
+            ui->comboBox->addItem(query.value(0).toString());
+    }
+}
+
+void MainWindow::sortDays()
+{
+    QList<QDate> *sorter = new  QList<QDate>();
+
+    for(int i = 0; i < ui->comboBox->count(); i++)
+    {
+        qDebug() << ui->comboBox->itemText(i);
+        sorter->append(QDate::fromString(ui->comboBox->itemText(i), "dd.MM.yyyy"));
+    }
+
+    std::sort(sorter->begin(), sorter->end());
+
+    QStringList *sortList = new QStringList();
+
+    for(int i = 0; i < sorter->count(); i++)
+    {
+        //qDebug() << sorter->at(i);
+        sortList->append(sorter->at(i).toString("dd.MM.yyyy"));
+    }
+
+    while(ui->comboBox->count() > 0)
+    {
+        ui->comboBox->removeItem(0);
+    }
+
+
+    ui->comboBox->addItems(*sortList);
 }
 
 void MainWindow::drawTimeLine()
@@ -252,10 +343,14 @@ void MainWindow::on_ekle_btn_clicked()
             QString barcode = cell->dynamicCall("Value()").toString();
             X="C"+QString::number(r);
             cell = sheet->querySubObject("Range(QVariant, QVariant)",X);
+            int quantity = cell->dynamicCall("Value()").toInt();
+            X="D"+QString::number(r);
+            cell = sheet->querySubObject("Range(QVariant, QVariant)",X);
             double time = cell->dynamicCall("Value()").toDouble();
-            query.prepare("insert into parca values(:barcode,:time)");
+            query.prepare("insert into parca values(:barcode,:time, :quantity)");
             query.bindValue(":barcode", barcode);
             query.bindValue(":time", time);
+            query.bindValue(":quantity", quantity);
             query.exec();
         }
         listAdder();
@@ -267,9 +362,9 @@ void MainWindow::on_ekle_btn_clicked()
 void MainWindow::tableItemClicked(QTableWidgetItem *item)
 {
     QSqlQuery query;
-    query.exec("select time from parca where barcode = '" + item->text() + "'");
+    query.exec("select time, quantity from parca where barcode = '" + item->text() + "'");
     query.next();
-    Sure_Duzenleme *sd = new Sure_Duzenleme(this, item, query.value(0).toDouble(), twList);
+    Sure_Duzenleme *sd = new Sure_Duzenleme(this, item, query.value(0).toDouble(), query.value(1).toInt() , twList);
     sd->show();
 }
 
@@ -459,6 +554,7 @@ void MainWindow::on_excel_olustur_btn_clicked()
     }
 }
 
+/*
 void MainWindow::tabloHatirla()
 {
     QSqlQuery query;
@@ -466,17 +562,61 @@ void MainWindow::tabloHatirla()
 
     while(query.next())
     {
-        if(query.value(0).toString() != QDate::currentDate().toString("dd.MM.yyyy"))
+        if(query.value(0).toString() == QDate::currentDate().toString("dd.MM.yyyy"))
         {
-            qDebug() << "Farklı gun";
+            addItem(twList->at(query.value(1).toInt()), query.value(3).toString(), query.value(2).toDouble());
         }
         //tw, barcode, time
-        addItem(twList->at(query.value(1).toInt()), query.value(3).toString(), query.value(2).toDouble());
+
     }
 }
+*/
 
 void MainWindow::setMovementSec(QTableWidgetItem *item)
 {
     prevItem = item;
+}
+
+
+void MainWindow::on_comboBox_currentTextChanged(const QString &arg1)
+{
+
+    ui->tableWidget->setHorizontalHeaderLabels(QStringList(arg1));
+
+    for(int i = 0; i < twList->count(); i++)
+    {
+        while(twList->at(i)->columnCount() > 0)
+        {
+            twList->at(i)->removeColumn(0);
+        }
+    }
+
+    QSqlQuery query;
+    query.exec("select * from tablo");
+    while(query.next())
+    {
+        if(query.value(0).toString() == arg1)
+        {
+            addItem(twList->at(query.value(1).toInt()), query.value(3).toString(), query.value(2).toDouble());
+        }
+    }
+}
+
+
+void MainWindow::on_geri_btn_clicked()
+{
+    if(ui->comboBox->currentIndex() > 0)
+    {
+        ui->comboBox->setCurrentIndex(ui->comboBox->currentIndex() - 1);
+    }
+}
+
+
+void MainWindow::on_ileri_btn_clicked()
+{
+    if(ui->comboBox->currentIndex() < ui->comboBox->count() - 1)
+    {
+        ui->comboBox->setCurrentIndex(ui->comboBox->currentIndex() + 1);
+    }
 }
 

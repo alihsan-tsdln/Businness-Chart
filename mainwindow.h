@@ -13,6 +13,7 @@
 #include "sure_duzenleme.h"
 #include "parca_ekle.h"
 #include <QTimer>
+#include <QtAlgorithms>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -53,11 +54,17 @@ private slots:
 
     void on_excel_olustur_btn_clicked();
 
-    void tabloHatirla();
+    //void tabloHatirla();
 
     void setMovementSec(QTableWidgetItem *item);
 
     void drawTimeLine();
+
+    void on_comboBox_currentTextChanged(const QString &arg1);
+
+    void on_geri_btn_clicked();
+
+    void on_ileri_btn_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -68,5 +75,8 @@ private:
     void colorAdder();
     void listInit();
     void tabloUpdate();
+    void addWeek();
+    void addPastWeeks();
+    void sortDays();
 };
 #endif // MAINWINDOW_H

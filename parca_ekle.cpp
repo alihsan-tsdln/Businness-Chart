@@ -16,9 +16,10 @@ Parca_Ekle::~Parca_Ekle()
 void Parca_Ekle::on_pushButton_clicked()
 {
     QSqlQuery query;
-    query.prepare("insert into parca values(:barcode, :time)");
+    query.prepare("insert into parca values(:barcode, :time, :quantity)");
     query.bindValue(":barcode", ui->lineEdit->text());
     query.bindValue(":time", ui->doubleSpinBox->value());
+    query.bindValue(":quantity", ui->spinBox->value());
 
     if(!query.exec())
     {

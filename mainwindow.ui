@@ -378,6 +378,42 @@
      </item>
     </layout>
    </widget>
+   <widget class="QComboBox" name="comboBox">
+    <property name="geometry">
+     <rect>
+      <x>780</x>
+      <y>0</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ileri_btn">
+    <property name="geometry">
+     <rect>
+      <x>880</x>
+      <y>610</y>
+      <width>31</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>İleri</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="geri_btn">
+    <property name="geometry">
+     <rect>
+      <x>850</x>
+      <y>610</y>
+      <width>31</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Geri</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

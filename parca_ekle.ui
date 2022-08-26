@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>323</width>
-    <height>221</height>
+    <height>290</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -58,14 +58,14 @@
     </font>
    </property>
    <property name="text">
-    <string>Süre     :  </string>
+    <string>Adet     :  </string>
    </property>
   </widget>
   <widget class="QDoubleSpinBox" name="doubleSpinBox">
    <property name="geometry">
     <rect>
      <x>100</x>
-     <y>90</y>
+     <y>140</y>
      <width>171</width>
      <height>31</height>
     </rect>
@@ -78,13 +78,42 @@
    <property name="geometry">
     <rect>
      <x>90</x>
-     <y>140</y>
+     <y>200</y>
      <width>131</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
     <string>Ekle</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>140</y>
+     <width>61</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Süre     :  </string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spinBox">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>90</y>
+     <width>171</width>
+     <height>31</height>
+    </rect>
    </property>
   </widget>
  </widget>

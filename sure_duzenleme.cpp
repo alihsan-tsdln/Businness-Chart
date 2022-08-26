@@ -5,7 +5,7 @@ QTableWidgetItem *itm;
 int row;
 int column;
 
-Sure_Duzenleme::Sure_Duzenleme(QWidget *parent, QTableWidgetItem *item, double time, QList<QTableWidget*> *twList) :
+Sure_Duzenleme::Sure_Duzenleme(QWidget *parent, QTableWidgetItem *item, double time, int quantity, QList<QTableWidget*> *twList) :
     QDialog(parent),
     ui(new Ui::Sure_Duzenleme)
 {
@@ -19,6 +19,7 @@ Sure_Duzenleme::Sure_Duzenleme(QWidget *parent, QTableWidgetItem *item, double t
                + " and column = " + QString::number(column));
     query.next();
     ui->plainTextEdit->setPlainText(query.value(0).toString());
+    ui->spinBox->setValue(quantity);
     itm = item;
 }
 
@@ -31,27 +32,43 @@ void Sure_Duzenleme::on_pushButton_clicked()
 {
     QSqlQuery query;
     QSqlQuery qry;
-    query.exec("update parca set time = " + QString::number(ui->doubleSpinBox->value()) + " where barcode = '" + itm->text() + "'");
+    query.exec("update parca set time = " + QString::number(ui->doubleSpinBox->value()) + ", quantity = " + QString::number(ui->spinBox->value()) + " where barcode = '" + itm->text() + "'");
     itm->tableWidget()->setColumnWidth(itm->column(), 364 * ui->doubleSpinBox->value() / 225);
     query.exec("select aciklama from aciklama where row = " + QString::number(row) + " and column = " + QString::number(column));
     query.next();
     if(query.value(0).toString().isEmpty())
     {
-        qry.prepare("insert into aciklama values(:row,:column,:aciklama)");
-        qry.bindValue(":row", row);
-        qry.bindValue(":column", column);
-        qry.bindValue(":aciklama", ui->plainTextEdit->toPlainText());
-        qry.exec();
+        if(!ui->plainTextEdit->toPlainText().isEmpty())
+        {
+            qry.prepare("insert into aciklama values(:row,:column,:aciklama)");
+            qry.bindValue(":row", row);
+            qry.bindValue(":column", column);
+            qry.bindValue(":aciklama", ui->plainTextEdit->toPlainText());
+            qry.exec();
+        }
     }
 
     else
     {
-        qry.exec("update aciklama set aciklama = '"
-                 + ui->plainTextEdit->toPlainText()
-                 + "' where row = "
-                 + QString::number(row)
-                 + " and column = "
-                 + QString::number(column));
+        if(ui->plainTextEdit->toPlainText().isEmpty())
+        {
+            qry.exec("update aciklama set aciklama = '"
+                     + QString(" ")
+                     + "' where row = "
+                     + QString::number(row)
+                     + " and column = "
+                     + QString::number(column));
+        }
+
+        else
+        {
+            qry.exec("update aciklama set aciklama = '"
+                     + ui->plainTextEdit->toPlainText()
+                     + "' where row = "
+                     + QString::number(row)
+                     + " and column = "
+                     + QString::number(column));
+        }
     }
     this->deleteLater();
 }
