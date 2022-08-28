@@ -22,6 +22,7 @@ QStringList *lst;
 int fixedRow = 0;
 QTableWidgetItem *prevItem = nullptr;
 QLabel *labelLine = nullptr;
+QTableWidgetItem *delParca = nullptr;
 
 void MainWindow::init()
 {
@@ -37,6 +38,7 @@ void MainWindow::init()
     alphabet->append("A");
     alphabet->append("B");
     alphabet->append("C");
+    alphabet->append("D");
     lst = new QStringList();
     lst->append("Barkod No");
     lst->append("Parça Adı");
@@ -158,31 +160,27 @@ void MainWindow::listInit()
 void MainWindow::tabloUpdate()
 {
     QSqlQuery query;
+    QSqlQuery qry;
     query.exec("delete from tablo where tarih = '" + ui->tableWidget->horizontalHeaderItem(0)->text() + "'");
 
     for(int i = 0; i < twList->count(); i++)
     {
         for(int j = 0; j < twList->at(i)->columnCount(); j++)
         {
-            query.prepare("insert into tablo values(:tarih, :tezgah, :genislik, :barkod, :sira)");
-            query.bindValue(":tarih", ui->tableWidget->horizontalHeaderItem(0)->text());
-            query.bindValue(":tezgah", i);
-            query.bindValue(":genislik", 225 * twList->at(i)->columnWidth(j) / 364);
-            query.bindValue(":barkod", twList->at(i)->item(0,j)->text());
-            query.bindValue(":sira", j);
+            qry.prepare("insert into tablo values(:tarih, :tezgah, :genislik, :barkod, :sira)");
+            qry.bindValue(":tarih", ui->tableWidget->horizontalHeaderItem(0)->text());
+            qry.bindValue(":tezgah", i);
+            qry.bindValue(":genislik", 225 * twList->at(i)->columnWidth(j) / 364);
+            qry.bindValue(":barkod", twList->at(i)->item(0,j)->text());
+            qry.bindValue(":sira", j);
 
-            if(!query.exec())
-                qDebug() << query.lastError().text();
+            qry.exec();
         }
     }
 }
 
 void MainWindow::addWeek()
 {
-/*
-    ui->comboBox->addItem();
-*/
-
     QStringList *weeks = new QStringList();
     weeks->append(QDate::currentDate().toString("dd.MM.yyyy"));
     weeks->append(QDate::currentDate().addDays(1).toString("dd.MM.yyyy"));
@@ -238,7 +236,6 @@ void MainWindow::sortDays()
 
     for(int i = 0; i < ui->comboBox->count(); i++)
     {
-        qDebug() << ui->comboBox->itemText(i);
         sorter->append(QDate::fromString(ui->comboBox->itemText(i), "dd.MM.yyyy"));
     }
 
@@ -248,7 +245,6 @@ void MainWindow::sortDays()
 
     for(int i = 0; i < sorter->count(); i++)
     {
-        //qDebug() << sorter->at(i);
         sortList->append(sorter->at(i).toString("dd.MM.yyyy"));
     }
 
@@ -268,7 +264,24 @@ void MainWindow::drawTimeLine()
         labelLine->deleteLater();
         labelLine = nullptr;
     }
+
     int mesai = QTime::currentTime().addSecs(-30600).hour() * 60 + QTime::currentTime().addSecs(-30600).minute();
+    qDebug() << mesai;
+    if(QTime::currentTime() > QTime::fromString("10:30:00", "hh:mm:ss"))
+    {
+        mesai = mesai - 15;
+    }
+
+    if(QTime::currentTime() > QTime::fromString("13:00:00", "hh:mm:ss"))
+    {
+        mesai = mesai - 60;
+    }
+
+    if(QTime::currentTime() > QTime::fromString("15:30:00", "hh:mm:ss"))
+    {
+        mesai = mesai - 15;
+    }
+
     if(mesai > 0 && mesai <= 450)
     {
         labelLine = new QLabel(this);
@@ -364,7 +377,7 @@ void MainWindow::tableItemClicked(QTableWidgetItem *item)
     QSqlQuery query;
     query.exec("select time, quantity from parca where barcode = '" + item->text() + "'");
     query.next();
-    Sure_Duzenleme *sd = new Sure_Duzenleme(this, item, query.value(0).toDouble(), query.value(1).toInt() , twList);
+    Sure_Duzenleme *sd = new Sure_Duzenleme(this, item, query.value(0).toDouble(), query.value(1).toInt(), ui->tableWidget->horizontalHeaderItem(0)->text() , twList);
     sd->show();
 }
 
@@ -397,6 +410,8 @@ void MainWindow::on_parca_sil_clicked()
 
 void MainWindow::on_listWidget_itemClicked(QListWidgetItem *item)
 {
+    prevItem = nullptr;
+    delParca = nullptr;
     delItem = item;
 }
 
@@ -437,7 +452,7 @@ void MainWindow::on_template_olustur_clicked()
     ui->statusbar->showMessage("Yüklendi",5);
 }
 
-QTableWidgetItem *delParca = nullptr;
+
 
 
 void MainWindow::on_parca_sil_btn_clicked()
@@ -453,7 +468,10 @@ void MainWindow::on_parca_sil_btn_clicked()
             query.exec("delete from aciklama where row = "
                        + QString::number(twList->indexOf(delParca->tableWidget()))
                        + " and column = "
-                       + QString::number(delParca->column()));
+                       + QString::number(delParca->column())
+                       + " and tarih = '"
+                       + ui->tableWidget->horizontalHeaderItem(0)->text()
+                       + "'");
             delParca->tableWidget()->removeColumn(delParca->column());
             delParca = nullptr;
             tabloUpdate();
@@ -491,10 +509,11 @@ void MainWindow::on_excel_olustur_btn_clicked()
        QAxObject *cellX;
 
        lst->remove(1);
-       alphabet->append("D");
        alphabet->append("E");
+       alphabet->append("F");
        lst->append("Tezgah Adı");
        lst->append("Tarih");
+       lst->append("Adet");
        lst->append("Açıklama");
 
 
@@ -506,6 +525,8 @@ void MainWindow::on_excel_olustur_btn_clicked()
        }
 
        lst->insert(1,"Parça Adı");
+       lst->remove(2);
+       lst->remove(2);
        lst->remove(2);
        lst->remove(2);
        lst->remove(2);
@@ -530,12 +551,20 @@ void MainWindow::on_excel_olustur_btn_clicked()
                 cellX->dynamicCall("SetValue(const QVariant&)",QVariant(ui->tableWidget->verticalHeaderItem(i)->text()));
                 X = alphabet->at(3) + QString::number(girdiCell);
                 cellX = worksheet->querySubObject("Range(QVariant, QVariant)",X);
-                cellX->dynamicCall("SetValue(const QVariant&)",QVariant(QDate::currentDate().toString("dd.MM.yyyy")));
+                cellX->dynamicCall("SetValue(const QVariant&)",QVariant(ui->tableWidget->horizontalHeaderItem(0)->text()));
                 X = alphabet->at(4) + QString::number(girdiCell);
+                cellX = worksheet->querySubObject("Range(QVariant, QVariant)",X);
+                query.exec("select quantity from parca where barcode = '" + twList->at(i)->item(0,j)->text() + "'");
+                query.next();
+                cellX->dynamicCall("SetValue(const QVariant&)",QVariant(query.value(0).toString()));
+                X = alphabet->at(5) + QString::number(girdiCell);
                 query.exec("select aciklama from aciklama where row = "
                            + QString::number(i)
                            + " and column = "
-                           + QString::number(j));
+                           + QString::number(j)
+                           + " and tarih = '"
+                           + ui->tableWidget->horizontalHeaderItem(0)->text()
+                           + "'");
                 query.next();
                 cellX = worksheet->querySubObject("Range(QVariant, QVariant)",X);
                 cellX->dynamicCall("SetValue(const QVariant&)",QVariant(query.value(0).toString()));
@@ -554,23 +583,6 @@ void MainWindow::on_excel_olustur_btn_clicked()
     }
 }
 
-/*
-void MainWindow::tabloHatirla()
-{
-    QSqlQuery query;
-    query.exec("select * from tablo");
-
-    while(query.next())
-    {
-        if(query.value(0).toString() == QDate::currentDate().toString("dd.MM.yyyy"))
-        {
-            addItem(twList->at(query.value(1).toInt()), query.value(3).toString(), query.value(2).toDouble());
-        }
-        //tw, barcode, time
-
-    }
-}
-*/
 
 void MainWindow::setMovementSec(QTableWidgetItem *item)
 {
@@ -580,6 +592,9 @@ void MainWindow::setMovementSec(QTableWidgetItem *item)
 
 void MainWindow::on_comboBox_currentTextChanged(const QString &arg1)
 {
+    prevItem = nullptr;
+    delParca = nullptr;
+    delItem = nullptr;
 
     ui->tableWidget->setHorizontalHeaderLabels(QStringList(arg1));
 
@@ -592,12 +607,13 @@ void MainWindow::on_comboBox_currentTextChanged(const QString &arg1)
     }
 
     QSqlQuery query;
-    query.exec("select * from tablo");
-    while(query.next())
+    query.prepare("select * from tablo where tarih = '" + arg1 + "'");
+
+    if(query.exec())
     {
-        if(query.value(0).toString() == arg1)
+        while(query.next())
         {
-            addItem(twList->at(query.value(1).toInt()), query.value(3).toString(), query.value(2).toDouble());
+            addItem(twList->at(query.value(1).toInt()), query.value(3).toString(), query.value(2).toInt());
         }
     }
 }
@@ -618,5 +634,12 @@ void MainWindow::on_ileri_btn_clicked()
     {
         ui->comboBox->setCurrentIndex(ui->comboBox->currentIndex() + 1);
     }
+}
+
+
+void MainWindow::on_listWidget_itemPressed(QListWidgetItem *item)
+{
+    prevItem = nullptr;
+    delItem = nullptr;
 }
 

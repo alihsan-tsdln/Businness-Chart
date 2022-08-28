@@ -54,8 +54,6 @@ private slots:
 
     void on_excel_olustur_btn_clicked();
 
-    //void tabloHatirla();
-
     void setMovementSec(QTableWidgetItem *item);
 
     void drawTimeLine();
@@ -65,6 +63,8 @@ private slots:
     void on_geri_btn_clicked();
 
     void on_ileri_btn_clicked();
+
+    void on_listWidget_itemPressed(QListWidgetItem *item);
 
 private:
     Ui::MainWindow *ui;

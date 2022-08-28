@@ -15,7 +15,7 @@ class Sure_Duzenleme : public QDialog
     Q_OBJECT
 
 public:
-    explicit Sure_Duzenleme(QWidget *parent = nullptr, QTableWidgetItem *item = nullptr, double time = 0, int quantity = 0 , QList<QTableWidget*> *twList = nullptr);
+    explicit Sure_Duzenleme(QWidget *parent = nullptr, QTableWidgetItem *item = nullptr, double time = 0, int quantity = 0 , QString date = "" , QList<QTableWidget*> *twList = nullptr);
     ~Sure_Duzenleme();
 
 private slots:
